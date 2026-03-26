@@ -1,0 +1,3 @@
+--theoretical aspects
+--diagrams and designs
+--architecture
