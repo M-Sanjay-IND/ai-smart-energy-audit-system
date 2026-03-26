@@ -1,8 +1,10 @@
-from flask import Flask, request, jsonify
 import joblib
 import numpy as np
 from datetime import datetime
-
+import os
+import json
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 # Firebase
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -12,6 +14,7 @@ from firebase_admin import credentials, firestore
 # -------------------------
 
 app = Flask(__name__)
+CORS(app)
 
 # Load ML models ONCE (with safety fallback if missing)
 try:
@@ -37,9 +40,26 @@ last_reading = {
 }
 
 # Firebase setup
-cred = credentials.Certificate("firebase_key.json")
-firebase_admin.initialize_app(cred)
-db = firestore.client()
+firebase_key_path = "firebase_key.json"
+if os.path.exists(firebase_key_path):
+    cred = credentials.Certificate(firebase_key_path)
+elif os.environ.get("FIREBASE_SERVICE_ACCOUNT"):
+    # Allow loading from env var for easier RPi deployment
+    try:
+        service_account_info = json.loads(os.environ.get("FIREBASE_SERVICE_ACCOUNT"))
+        cred = credentials.Certificate(service_account_info)
+    except Exception as e:
+        print(f"Error parsing FIREBASE_SERVICE_ACCOUNT env var: {e}")
+        cred = None
+else:
+    print("WARNING: Firebase credentials not found. Database features will fail.")
+    cred = None
+
+if cred:
+    firebase_admin.initialize_app(cred)
+    db = firestore.client()
+else:
+    db = None
 
 # -------------------------
 # ROUTES
@@ -153,7 +173,10 @@ def receive_data():
             "confidence": confidence
         }
 
-        db.collection("energy_data").add(doc)
+        if db:
+            db.collection("energy_data").add(doc)
+        else:
+            print("Database not initialized, skipping store.")
 
         # -------------------------
         # RESPONSE TO ESP32
@@ -178,6 +201,9 @@ def receive_data():
 @app.route('/get-data', methods=['GET'])
 def get_data():
     try:
+        if not db:
+            return jsonify({"error": "Database not initialized"}), 500
+
         docs = db.collection("energy_data")\
                  .order_by("timestamp", direction=firestore.Query.DESCENDING)\
                  .limit(100)\
@@ -193,6 +219,9 @@ def get_data():
                 d["timestamp"] = d["timestamp"].isoformat()
 
             data_list.append(d)
+
+        # Reverse the list so frontend receives items in chronological order (oldest first, newest last)
+        data_list.reverse()
 
         return jsonify(data_list)
 

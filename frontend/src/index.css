@@ -110,7 +110,9 @@ button {
   background: none;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   font-family: var(--font-sans);
   background: var(--bg-input);
   border: 1px solid var(--border-primary);
@@ -121,7 +123,9 @@ input, select, textarea {
   transition: border-color var(--transition-fast);
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   border-color: var(--accent-green);
   outline: none;
   box-shadow: 0 0 0 3px var(--accent-green-dim);
@@ -460,7 +464,8 @@ input:focus, select:focus, textarea:focus {
   letter-spacing: 0.02em;
 }
 
-.badge-online, .badge-normal {
+.badge-online,
+.badge-normal {
   background: rgba(0, 255, 136, 0.1);
   color: var(--status-online);
   border: 1px solid rgba(0, 255, 136, 0.2);
@@ -493,8 +498,15 @@ input:focus, select:focus, textarea:focus {
 }
 
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
 }
 
 /* ---------- Charts ---------- */
@@ -615,6 +627,7 @@ input:focus, select:focus, textarea:focus {
     opacity: 0;
     transform: translateX(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -713,25 +726,60 @@ select {
 
 /* ---------- Animations ---------- */
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .animate-in {
   animation: fade-in 0.5s ease-out forwards;
 }
 
-.animate-in-delay-1 { animation-delay: 0.05s; opacity: 0; }
-.animate-in-delay-2 { animation-delay: 0.1s; opacity: 0; }
-.animate-in-delay-3 { animation-delay: 0.15s; opacity: 0; }
-.animate-in-delay-4 { animation-delay: 0.2s; opacity: 0; }
-.animate-in-delay-5 { animation-delay: 0.25s; opacity: 0; }
-.animate-in-delay-6 { animation-delay: 0.3s; opacity: 0; }
+.animate-in-delay-1 {
+  animation-delay: 0.05s;
+  opacity: 0;
+}
+
+.animate-in-delay-2 {
+  animation-delay: 0.1s;
+  opacity: 0;
+}
+
+.animate-in-delay-3 {
+  animation-delay: 0.15s;
+  opacity: 0;
+}
+
+.animate-in-delay-4 {
+  animation-delay: 0.2s;
+  opacity: 0;
+}
+
+.animate-in-delay-5 {
+  animation-delay: 0.25s;
+  opacity: 0;
+}
+
+.animate-in-delay-6 {
+  animation-delay: 0.3s;
+  opacity: 0;
+}
 
 /* ---------- Live pulse indicator ---------- */
 .live-indicator {
@@ -754,9 +802,12 @@ select {
 }
 
 @keyframes live-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.5);
   }
+
   50% {
     box-shadow: 0 0 0 8px rgba(0, 255, 136, 0);
   }

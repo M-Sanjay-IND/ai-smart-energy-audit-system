@@ -147,10 +147,10 @@ export default function Dashboard() {
             </div>
             <div>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 4 }}>Confidence</div>
-              <div style={{ 
-                height: 6, 
-                background: 'var(--border-primary)', 
-                borderRadius: 3, 
+              <div style={{
+                height: 6,
+                background: 'var(--border-primary)',
+                borderRadius: 3,
                 overflow: 'hidden',
                 maxWidth: 200
               }}>
