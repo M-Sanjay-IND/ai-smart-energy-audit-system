@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = 'http://10.28.23.225:5000';
 
 export interface EnergyRecord {
   timestamp: string;
