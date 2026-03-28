@@ -4,8 +4,7 @@ __pycache__/
 *$py.class
 
 #db_keys
-backend/firebase_keys.json
-*.json
+backend/firebase_key.json
 
 # C extensions
 *.so
