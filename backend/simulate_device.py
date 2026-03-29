@@ -3,7 +3,7 @@ import requests
 import random
 import math
 
-SERVER_URL = "http://127.0.0.1:5000/data"
+SERVER_URL = "https://digestible-semifine-chloe.ngrok-free.dev/data"
 
 def simulate():
     print(f"Starting ESP32 simulation... sending data to {SERVER_URL} every 5 seconds\n")
@@ -12,6 +12,9 @@ def simulate():
     
     # Base load
     base_voltage = 230.0
+    
+    session = requests.Session()
+    session.headers.update({"ngrok-skip-browser-warning": "true"})
     
     try:
         while True:
@@ -39,13 +42,14 @@ def simulate():
             }
             
             try:
-                response = requests.post(SERVER_URL, json=payload, timeout=10)
+                response = session.post(SERVER_URL, json=payload, timeout=10)
                 if response.status_code == 200:
-                    print(f"Sent: {payload['power']}W -- ML Confidence: {response.json().get('confidence')}%")
+                    data_out = response.json()
+                    print(f"Sent: {payload['power']}W -- ML Confidence: {data_out.get('confidence')}% | Anomaly: {data_out.get('anomaly')}")
                 else:
-                    print(f"Failed to send: {response.status_code}")
+                    print(f"Failed to send: {response.status_code} - {response.text}")
             except Exception as e:
-                print(f"Connection error: {e}")
+                print(f"Connection error: {e}. Retrying next cycle...")
                 
             time.sleep(5)
             

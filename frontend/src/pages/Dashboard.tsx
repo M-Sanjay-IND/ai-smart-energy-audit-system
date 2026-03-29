@@ -1,6 +1,7 @@
 import Card from '../components/Card';
 import StatusBadge from '../components/StatusBadge';
 import PowerChart from '../components/PowerChart';
+import { useMemo } from 'react';
 import { useEnergyData } from '../hooks';
 
 export default function Dashboard() {
@@ -10,8 +11,28 @@ export default function Dashboard() {
   const latest = data.length > 0 ? data[data.length - 1] : null;
   const prevRecord = data.length > 1 ? data[data.length - 2] : null;
 
-  // Compute energy today (sum of energy from records)
-  const energyToday = data.reduce((sum, d) => sum + (d.energy || 0), 0);
+  // Compute energy today (sum of positive increments in consecutive records for today)
+  const energyToday = useMemo(() => {
+    let sum = 0;
+    const now = new Date();
+    const todayStr = now.toDateString();
+    
+    for (let i = 1; i < data.length; i++) {
+      const ts = new Date(data[i].timestamp);
+      if (ts.toDateString() === todayStr) {
+        // Find difference between this reading and previous
+        const prevTemp = data[i-1];
+        if (new Date(prevTemp.timestamp).toDateString() !== todayStr) {
+           // First reading of today compared to yesterday shouldn't be fully counted if it reset, 
+           // but since energy is cumulative across restarts, diff is fine.
+        }
+        const diff = (data[i].energy || 0) - (data[i-1].energy || 0);
+        // Only add positive differences (handles simulator resets back to 0)
+        if (diff > 0) sum += diff;
+      }
+    }
+    return sum;
+  }, [data]);
 
   // Chart data — show all available points with smart timestamp labels
   const chartData = data.slice(-50).map((d) => {

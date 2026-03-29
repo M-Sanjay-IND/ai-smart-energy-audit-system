@@ -5,6 +5,7 @@ import { useDeviceStatus, useEnergyData } from '../hooks';
 const navItems = [
   { path: '/', label: 'Dashboard', icon: '⚡', section: 'Overview' },
   { path: '/analytics', label: 'Analytics', icon: '📊', section: 'Overview' },
+  { path: '/calculator', label: 'Calculator', icon: '🧮', section: 'Overview' },
   { path: '/devices', label: 'Devices', icon: '🔌', section: 'Monitoring' },
   { path: '/alerts', label: 'Alerts', icon: '🚨', section: 'Monitoring' },
   { path: '/settings', label: 'Settings', icon: '⚙️', section: 'System' },

@@ -24,6 +24,10 @@ def create_features(df):
     df['delta_v'] = df['voltage'].diff().fillna(0)
     df['delta_i'] = df['current'].diff().fillna(0)
     df['delta_p'] = df['power'].diff().fillna(0)
+    
+    # Calculate History (rolling averages) to provide context graph
+    df['hist_mean_p_10'] = df['power'].rolling(window=10, min_periods=1).mean()
+    df['hist_mean_p_50'] = df['power'].rolling(window=50, min_periods=1).mean()
 
     # Target is predicting the NEXT delta power
     df['next_delta_p'] = df['delta_p'].shift(-1)
@@ -32,8 +36,7 @@ def create_features(df):
     return df
 
 def train_model(df):
-    # We only need 3 features so it matches live ESP32 server capabilities seamlessly!
-    feature_cols = ['delta_v', 'delta_i', 'delta_p']
+    feature_cols = ['delta_v', 'delta_i', 'delta_p', 'hist_mean_p_10', 'hist_mean_p_50']
 
     X = df[feature_cols].values
     y = df['next_delta_p'].values

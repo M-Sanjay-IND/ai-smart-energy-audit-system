@@ -5,6 +5,7 @@ import os
 import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from collections import deque
 # Firebase
 import firebase_admin
 from firebase_admin import credentials, firestore
@@ -38,6 +39,8 @@ last_reading = {
     "current": 0.0,
     "power": 0.0
 }
+
+power_history = deque([0.0]*50, maxlen=50)
 
 # Firebase setup
 firebase_key_path = "firebase_key.json"
@@ -104,15 +107,20 @@ def receive_data():
         last_reading["voltage"] = voltage
         last_reading["current"] = current
         last_reading["power"] = power
+        power_history.append(power)
+        
+        hist_10 = list(power_history)[-10:]
+        hist_mean_p_10 = sum(hist_10) / len(hist_10) if hist_10 else power
+        hist_mean_p_50 = sum(power_history) / len(power_history) if power_history else power
 
         # -------------------------
         # ML PREDICTION (Dynamic Random Forest)
         # -------------------------
         if rf_model is not None and rf_scaler is not None:
             try:
-                # Feed current deltas to predict NEXT delta
-                features_delta = np.array([[delta_v, delta_i, delta_p]])
-                features_scaled = rf_scaler.transform(features_delta)
+                # Feed current deltas + history to predict NEXT delta
+                features = np.array([[delta_v, delta_i, delta_p, hist_mean_p_10, hist_mean_p_50]])
+                features_scaled = rf_scaler.transform(features)
                 predicted_delta_p = float(rf_model.predict(features_scaled)[0])
                 
                 # Next absolute power = current power + predicted change
@@ -131,9 +139,9 @@ def receive_data():
 
         if iso_model is not None and iso_scaler is not None:
             try:
-                # IMPORTANT: Feed DELTAS (rate of change) to Isolation Forest!
-                features_delta = np.array([[delta_v, delta_i, delta_p]])
-                features_scaled = iso_scaler.transform(features_delta)
+                # IMPORTANT: Feed DELTAS (rate of change) + History to Isolation Forest!
+                features = np.array([[delta_v, delta_i, delta_p, hist_mean_p_10, hist_mean_p_50]])
+                features_scaled = iso_scaler.transform(features)
                 
                 anomaly_raw = iso_model.predict(features_scaled)[0]
                 anomaly = bool(anomaly_raw == -1)

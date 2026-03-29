@@ -103,8 +103,8 @@ def test_model(model, scaler, test_cases):
     print("TESTING ISOLATION FOREST")
     print("="*50)
     
-    for case_name, (voltage, current, power) in test_cases.items():
-        features = np.array([[voltage, current, power]])
+    for case_name, (voltage, current, power, h10, h50) in test_cases.items():
+        features = np.array([[voltage, current, power, h10, h50]])
         features_scaled = scaler.transform(features)
         prediction = model.predict(features_scaled)[0]
         score = model.decision_function(features_scaled)[0]
@@ -127,6 +127,8 @@ def main():
     # Prepare features as DELTAS (rate of change) so the model adapts to new steady states
     print("\nConverting absolute readings to deltas (rate of change)...")
     X_df = df[['voltage', 'current', 'power']].diff().fillna(0)
+    X_df['hist_mean_p_10'] = df['power'].rolling(window=10, min_periods=1).mean()
+    X_df['hist_mean_p_50'] = df['power'].rolling(window=50, min_periods=1).mean()
     X = X_df.values
     
     # Train model
@@ -137,12 +139,12 @@ def main():
     
     # Test with example cases (now representing CHANGE, not absolute values)
     test_cases = {
-        "Steady state (no change)": (0, 0, 0),
-        "Tiny fluctuation": (1.2, 0.05, 12),
-        "Turned on 60W bulb": (0, 0.26, 60),
-        "Massive power surge": (10, 8.0, 1500),
-        "Sudden voltage drop": (-40, 0, -50),
-        "Appliance disconnected": (0, -5.0, -1150)
+        "Steady state (no change)": (0, 0, 0, 1150, 1150),
+        "Tiny fluctuation": (1.2, 0.05, 12, 1150, 1150),
+        "Turned on 60W bulb": (0, 0.26, 60, 1150, 1150),
+        "Massive power surge": (10, 8.0, 1500, 1150, 1150),
+        "Sudden voltage drop": (-40, 0, -50, 1150, 1150),
+        "Appliance disconnected": (0, -5.0, -1150, 1150, 1150)
     }
     
     test_model(model, scaler, test_cases)

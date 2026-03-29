@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Analytics from './pages/Analytics';
+import Calculator from './pages/Calculator';
 import DeviceStatus from './pages/DeviceStatus';
 import Alerts from './pages/Alerts';
 import Settings from './pages/Settings';
@@ -34,6 +35,7 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/devices" element={<DeviceStatus />} />
+        <Route path="/calculator" element={<Calculator />} />
         <Route path="/alerts" element={<Alerts />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" replace />} />
