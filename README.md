@@ -12,12 +12,14 @@ An AI-powered IoT platform designed to monitor, analyze, and optimize household 
 
 ## 📖 Table of Contents
 - [Project Overview](#-project-overview)
+- [Why This Project?](#-why-this-project)
+- [How It Works](#-how-it-works)
 - [Key Features](#-key-features)
 - [System Architecture](#-system-architecture)
 - [Tech Stack](#-tech-stack)
 - [Repository Structure](#-repository-structure)
 - [Machine Learning Models](#-machine-learning-models)
-- [Setup & Installation](#-setup--installation)
+- [Getting Started & Operation](#-getting-started--operation)
 - [Team Members](#-team-members)
 - [License](#-license)
 
@@ -25,7 +27,34 @@ An AI-powered IoT platform designed to monitor, analyze, and optimize household 
 
 ## 🎯 Project Overview
 
-The goal of this open-source project is to build an intelligent energy monitoring system that helps users understand, predict, and optimize their electricity consumption. By combining edge IoT hardware, RESTful APIs, a cloud database, and specialized Machine Learning pipelines, the system provides real-time monitoring, intelligent anomaly detection, and highly accurate energy usage forecasting.
+The **AI-Based Smart Energy Audit System** is an end-to-end open-source solution built to bring commercial-grade energy auditing directly to homes and small industries. Instead of relying on monthly electricity bills to understand consumption, this system provides a real-time, second-by-second breakdown of electrical usage. 
+
+By combining edge IoT hardware, RESTful APIs, a cloud database, and specialized Machine Learning pipelines, the system not only acts as a smart meter but actively functions as an intelligent auditor. It automatically identifies wasteful consumption patterns, detects deteriorating appliances through electrical anomalies, and accurately forecasts future energy demands.
+
+---
+
+## 🌍 Why This Project?
+
+Energy consumption is one of the highest operational costs for both households and industries. However, most consumers have zero visibility into *how* their power is being used until the bill arrives. 
+
+1. **Undetected Waste:** Appliances often degrade over time, secretly drawing massive amounts of "vampire power" or operating inefficiently.
+2. **Safety Hazards:** Severe power surges and sudden voltage sags can irreparably damage expensive equipment or cause electrical fires.
+3. **Lack of Predictive Insights:** Without knowing future power demands, it is impossible to efficiently manage off-grid solar storage or budget for utility costs.
+
+This project solves these issues by bringing transparency to electrical consumption. It empowers users to reduce their carbon footprint, lower electricity bills, and ensure the safety of their electrical infrastructure through proactive AI monitoring.
+
+---
+
+## ⚙️ How It Works
+
+The system operates in a continuous, automated loop connecting physical hardware to cloud AI:
+
+1. **Physical Sensing:** Non-invasive SCT-013 current sensors clip onto the main power lines, while ZMPT101B sensors measure the live voltage.
+2. **Edge Processing:** An ESP32 microcontroller rapidly samples these analog signals, calculates the true RMS voltage, current, and instantaneous power, and packages the data.
+3. **Gateway Routing:** The ESP32 transmits the data over WiFi/MQTT to a local Raspberry Pi gateway, ensuring data is buffered and reliably forwarded even if the internet connection is unstable.
+4. **Backend Ingestion:** A centralized Python Flask REST API receives the telemetry data, cleans it, and prepares it for inference.
+5. **AI Analysis:** The data is passed through pre-trained Scikit-Learn models. The **Isolation Forest** checks the exact signature of the power draw for anomalies (like a motor failing), while the **Random Forest Regressor** predicts the power demand for the next time horizon.
+6. **Cloud & UI:** The enriched data (raw metrics + AI insights) is pushed to Firebase in real-time, where a frontend web dashboard fetches and displays the live audit to the end-user.
 
 ---
 
@@ -36,8 +65,8 @@ The goal of this open-source project is to build an intelligent energy monitorin
 - **RESTful Flask Backend**: Efficiently processes streams of time-series data.
 - **Cloud Synchronization**: Stores processed data securely in Firebase for real-time dashboard access.
 - **Machine Learning Analytics**:
-  - **Power Forecasting (Random Forest)**: Predicts the absolute power required in the next timestep utilizing lag features to prevent data leakage. Achieves extremely high accuracy ($R^2 > 0.90$).
-  - **Anomaly Detection (Isolation Forest)**: Unsupervised detection of extreme power surges, voltage sags, and appliance malfunctions.
+  - **Power Forecasting**: Predicts absolute power required utilizing lag features to prevent data leakage.
+  - **Anomaly Detection**: Unsupervised detection of extreme power surges, voltage sags, and appliance malfunctions.
 - **Automated Reporting**: Generates comprehensive `.docx` statistical reports and visual case studies automatically.
 
 ---
@@ -128,40 +157,60 @@ Our ML pipeline is designed specifically for highly volatile time-series electri
 
 ---
 
-## 🚀 Setup & Installation
+## 🚀 Getting Started & Operation
 
-### 1. Clone the Repository
+Follow these steps to get the source code, configure the backend, and operate the system locally.
+
+### 1. Get the Source Code
+You can clone the open-source repository directly to your local machine using Git:
 ```bash
 git clone https://github.com/your-username/ai-smart-energy-audit-system.git
 cd ai-smart-energy-audit-system
 ```
 
-### 2. Set Up Virtual Environment
+### 2. Set Up the Python Environment
+It is highly recommended to isolate the project dependencies using a Python virtual environment.
 ```bash
 cd backend
 python -m venv venv
-# Windows
+
+# Activate on Windows:
 .\venv\Scripts\activate
-# Linux/Mac
+
+# Activate on Linux/Mac:
 source venv/bin/activate
 ```
 
-### 3. Install Dependencies
+### 3. Install Required Packages
+Install all necessary Python libraries (Flask, Scikit-Learn, Pandas, etc.):
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configure Firebase
-- Download your Firebase Service Account JSON key.
-- Place it in `backend/firebase_key.json`.
-- The `server.py` automatically detects and initializes the Firebase connection.
+### 4. Configure the Cloud Database (Firebase)
+To allow the backend to sync data to the cloud dashboard:
+1. Create a project in the [Firebase Console](https://console.firebase.google.com/).
+2. Generate a new Private Key from **Project Settings > Service Accounts**.
+3. Download the JSON file and rename it to `firebase_key.json`.
+4. Place this file directly inside the `backend/` directory.
 
-### 5. Run the Backend API
+### 5. Operate the System (Start the Server)
+To begin processing data, start the core Flask API server:
 ```bash
 python server.py
 ```
-The server will start on `http://localhost:5000` and automatically load the pre-trained ML models from the `ml-models/` directory to begin processing incoming edge data.
+*The server will boot up on `http://localhost:5000`. It will automatically load the pre-trained Machine Learning models (`.pkl` files) from the `ml-models/` directory into memory.*
 
+### 6. Feeding Data into the System
+Once the server is running, it expects data to be POSTed to the `/data` endpoint. You have two options to operate the data feed:
+
+- **Option A (Real Hardware):** Flash the ESP32 code located in `firmware/esp32-code/` onto your microcontroller. Wire up the SCT-013 and ZMPT101B sensors according to the schematics in the `hardware/` directory. The ESP32 will automatically begin transmitting live electrical readings to your running Flask server.
+- **Option B (Simulation):** If you do not have the physical sensors, you can simulate an IoT device from your computer. Open a new terminal, activate your virtual environment, and run:
+  ```bash
+  cd scripts
+  python simulate_device.py
+  ```
+  This will artificially generate realistic electrical fluctuations and transmit them to your local server, triggering the AI models and Firebase sync just like a real device.
 
 ---
 
