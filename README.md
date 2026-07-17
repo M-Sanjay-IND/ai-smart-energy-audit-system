@@ -59,29 +59,29 @@ graph TD
 ## 💻 Tech Stack
 
 **Hardware & Edge:**
-- ESP32 Microcontroller
-- SCT-013 Current Sensor
-- ZMPT101B Voltage Sensor
-- Raspberry Pi (Gateway)
+- 🔌 ESP32 Microcontroller
+- ⚡ SCT-013 Current Sensor
+- 🔌 ZMPT101B Voltage Sensor
+- 🍓 Raspberry Pi (Gateway)
 
 **Backend & Data Processing:**
-- Python 3.9+
-- Flask API
-- Pandas & NumPy for data manipulation
+- 🐍 Python 3.9+
+- 🌶️ Flask API
+- 🐼 Pandas & NumPy for data manipulation
 
 **Machine Learning:**
-- Scikit-learn
-- Random Forest Regressor (Forecasting)
-- Isolation Forest (Anomaly Detection)
-- Joblib (Model Serialization)
+- 🧠 Scikit-learn
+- 🌲 Random Forest Regressor (Forecasting)
+- 🌳 Isolation Forest (Anomaly Detection)
+- 📦 Joblib (Model Serialization)
 
 **Database & Cloud:**
-- Firebase Realtime Database
+- 🔥 Firebase Realtime Database
 
 **Reporting & Visualization:**
-- Matplotlib & Seaborn
-- Jupyter Notebooks (`nbconvert`)
-- Python-docx
+- 📊 Matplotlib & Seaborn
+- 📓 Jupyter Notebooks (`nbconvert`)
+- 📄 Python-docx
 
 ---
 
