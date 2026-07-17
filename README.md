@@ -214,14 +214,16 @@ Once the server is running, it expects data to be POSTed to the `/data` endpoint
 
 ---
 
-## 👥 Team Members
+## 👥 Contributors & Team
 
-| Member | Role |
+This project is currently developed, backed, and maintained by **Sanjay**. The initial foundation and previous iterations included contributions from the following team members:
+
+| Member | Role / Contribution |
 |------|------|
-| **Sarvagya** | Hardware & Firmware Development |
-| **Sanjay** | Machine Learning, DevOps, UI Design |
-| **Jaswanth** | Backend Development (Flask APIs) |
-| **Asmit** | Frontend Development & Firebase Database |
+| **Sanjay** | Lead Developer, Machine Learning, DevOps, System Architecture, UI Design |
+| **Sarvagya** | Hardware & Firmware Assistance |
+| **Jaswanth** | Backend API Assistance |
+| **Asmit** | Frontend & Database Assistance |
 
 ---
 
