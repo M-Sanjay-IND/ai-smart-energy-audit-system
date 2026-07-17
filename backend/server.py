@@ -19,16 +19,20 @@ CORS(app)
 
 # Load ML models ONCE (with safety fallback if missing)
 try:
-    rf_model = joblib.load("rf_power_model.pkl") 
-    rf_scaler = joblib.load("rf_power_scaler.pkl")
-except:
+    rf_model = joblib.load(os.path.join("..", "ml-models", "rf_power_model.pkl")) 
+    rf_scaler = joblib.load(os.path.join("..", "ml-models", "rf_power_scaler.pkl"))
+    print("✅ RF Model loaded successfully!")
+except Exception as e:
+    print(f"⚠️ Could not load RF model: {e}")
     rf_model = None
     rf_scaler = None
 
 try:
-    iso_model = joblib.load("iso_model.pkl")
-    iso_scaler = joblib.load("iso_scaler.pkl")
-except:
+    iso_model = joblib.load(os.path.join("..", "ml-models", "iso_model.pkl"))
+    iso_scaler = joblib.load(os.path.join("..", "ml-models", "iso_scaler.pkl"))
+    print("✅ Isolation Forest model loaded successfully!")
+except Exception as e:
+    print(f"⚠️ Could not load IF model: {e}")
     iso_model = None
     iso_scaler = None
 
@@ -41,6 +45,7 @@ last_reading = {
 }
 
 power_history = deque([0.0]*50, maxlen=50)
+delta_p_history = deque([0.0]*3, maxlen=3)
 
 # Firebase setup
 firebase_key_path = "firebase_key.json"
@@ -112,19 +117,22 @@ def receive_data():
         hist_10 = list(power_history)[-10:]
         hist_mean_p_10 = sum(hist_10) / len(hist_10) if hist_10 else power
         hist_mean_p_50 = sum(power_history) / len(power_history) if power_history else power
+        
+        lag1_delta_p = delta_p_history[-1] if len(delta_p_history) >= 1 else 0.0
+        lag2_delta_p = delta_p_history[-2] if len(delta_p_history) >= 2 else 0.0
+        lag3_delta_p = delta_p_history[-3] if len(delta_p_history) >= 3 else 0.0
+        
+        delta_p_history.append(delta_p)
 
         # -------------------------
         # ML PREDICTION (Dynamic Random Forest)
         # -------------------------
         if rf_model is not None and rf_scaler is not None:
             try:
-                # Feed current deltas + history to predict NEXT delta
-                features = np.array([[delta_v, delta_i, delta_p, hist_mean_p_10, hist_mean_p_50]])
+                # Feed current deltas + history to predict NEXT absolute power
+                features = np.array([[delta_v, delta_i, delta_p, lag1_delta_p, lag2_delta_p, lag3_delta_p, hist_mean_p_10, hist_mean_p_50]])
                 features_scaled = rf_scaler.transform(features)
-                predicted_delta_p = float(rf_model.predict(features_scaled)[0])
-                
-                # Next absolute power = current power + predicted change
-                predicted_energy = power + predicted_delta_p
+                predicted_energy = float(rf_model.predict(features_scaled)[0])
             except Exception as e:
                 print("RF Prediction failed:", e)
                 predicted_energy = power
