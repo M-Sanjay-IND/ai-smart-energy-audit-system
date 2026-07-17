@@ -11,21 +11,20 @@ An AI-powered IoT platform designed to monitor, analyze, and optimize household 
 ---
 
 ## 📖 Table of Contents
-- [Project Overview](#-project-overview)
-- [Why This Project?](#-why-this-project)
-- [How It Works](#-how-it-works)
-- [Key Features](#-key-features)
-- [System Architecture](#-system-architecture)
-- [Tech Stack](#-tech-stack)
-- [Repository Structure](#-repository-structure)
-- [Machine Learning Models](#-machine-learning-models)
-- [Getting Started & Operation](#-getting-started--operation)
-- [Team Members](#-team-members)
-- [License](#-license)
+- [Abstract](#abstract)
+- [I. Introduction](#i-introduction)
+- [II. Proposed Methodology (How It Works)](#ii-proposed-methodology-how-it-works)
+- [III. Key Features](#iii-key-features)
+- [IV. System Architecture & Tech Stack](#iv-system-architecture--tech-stack)
+- [V. Machine Learning Framework](#v-machine-learning-framework)
+- [VI. Repository Structure](#vi-repository-structure)
+- [VII. Experimental Setup & Operation](#vii-experimental-setup--operation)
+- [VIII. Contributors & Team](#viii-contributors--team)
+- [IX. License](#ix-license)
 
 ---
 
-## 🎯 Project Overview
+## Abstract
 
 The **AI-Based Smart Energy Audit System** is an end-to-end open-source solution built to bring commercial-grade energy auditing directly to homes and small industries. Instead of relying on monthly electricity bills to understand consumption, this system provides a real-time, second-by-second breakdown of electrical usage. 
 
@@ -33,7 +32,7 @@ By combining edge IoT hardware, RESTful APIs, a cloud database, and specialized 
 
 ---
 
-## 🌍 Why This Project?
+## I. Introduction
 
 Energy consumption is one of the highest operational costs for both households and industries. However, most consumers have zero visibility into *how* their power is being used until the bill arrives. 
 
@@ -45,7 +44,7 @@ This project solves these issues by bringing transparency to electrical consumpt
 
 ---
 
-## ⚙️ How It Works
+## II. Proposed Methodology (How It Works)
 
 The system operates in a continuous, automated loop connecting physical hardware to cloud AI:
 
@@ -58,7 +57,7 @@ The system operates in a continuous, automated loop connecting physical hardware
 
 ---
 
-## ✨ Key Features
+## III. Key Features
 
 - **Real-Time Energy Monitoring**: Collects Voltage, Current, and Power data at high frequencies.
 - **IoT Data Pipeline**: Seamless transmission from ESP32 edge devices through a Raspberry Pi gateway.
@@ -71,8 +70,9 @@ The system operates in a continuous, automated loop connecting physical hardware
 
 ---
 
-## 🏗️ System Architecture
+## IV. System Architecture & Tech Stack
 
+### Architecture Diagram
 ```mermaid
 graph TD
     A[Hardware Sensors\nVoltage + Current] -->|Raw Data| B[ESP32 Microcontroller]
@@ -83,9 +83,7 @@ graph TD
     F -->|Fetch| G[Frontend Dashboard]
 ```
 
----
-
-## 💻 Tech Stack
+### 💻 Technologies Utilized
 
 **Hardware & Edge:**
 - 🔌 ESP32 Microcontroller
@@ -114,7 +112,22 @@ graph TD
 
 ---
 
-## 📁 Repository Structure
+## V. Machine Learning Framework
+
+Our ML pipeline is designed specifically for highly volatile time-series electrical data.
+
+1. **Forecasting (Random Forest Regressor)**: 
+   - **Target**: Next timestep's absolute power (`next_p`).
+   - **Features**: Current deltas ($\Delta V$, $\Delta I$, $\Delta P$), historical rolling means (`hist_mean_10`, `hist_mean_50`), and lag features (`lag1`, `lag2`, `lag3`) to maintain time-series integrity and entirely eliminate data leakage.
+   - **Performance**: Consistently achieves an $R^2$ score $\ge 0.70$ (often $>0.90$ on clean datasets).
+   
+2. **Anomaly Detection (Isolation Forest)**:
+   - Detects abnormal operating behaviors (e.g., massive power surges, sudden voltage drops, or disconnected appliances).
+   - Expected contamination rate dynamically calibrated per deployment.
+
+---
+
+## VI. Repository Structure
 
 ```text
 ai-smart-energy-audit-system/
@@ -142,22 +155,7 @@ ai-smart-energy-audit-system/
 
 ---
 
-## 🧠 Machine Learning Models
-
-Our ML pipeline is designed specifically for highly volatile time-series electrical data.
-
-1. **Forecasting (Random Forest Regressor)**: 
-   - **Target**: Next timestep's absolute power (`next_p`).
-   - **Features**: Current deltas ($\Delta V$, $\Delta I$, $\Delta P$), historical rolling means (`hist_mean_10`, `hist_mean_50`), and lag features (`lag1`, `lag2`, `lag3`) to maintain time-series integrity and entirely eliminate data leakage.
-   - **Performance**: Consistently achieves an $R^2$ score $\ge 0.70$ (often $>0.90$ on clean datasets).
-   
-2. **Anomaly Detection (Isolation Forest)**:
-   - Detects abnormal operating behaviors (e.g., massive power surges, sudden voltage drops, or disconnected appliances).
-   - Expected contamination rate dynamically calibrated per deployment.
-
----
-
-## 🚀 Getting Started & Operation
+## VII. Experimental Setup & Operation
 
 Follow these steps to get the source code, configure the backend, and operate the system locally.
 
@@ -214,7 +212,7 @@ Once the server is running, it expects data to be POSTed to the `/data` endpoint
 
 ---
 
-## 👥 Contributors & Team
+## VIII. Contributors & Team
 
 This project is currently developed, backed, and maintained by **Sanjay**. The initial foundation and previous iterations included contributions from the following team members:
 
@@ -227,6 +225,6 @@ This project is currently developed, backed, and maintained by **Sanjay**. The i
 
 ---
 
-## 📄 License
+## IX. License
 
 This project is licensed under the **MIT License**. Feel free to use, modify, and distribute the code as you see fit for both open-source and commercial applications.
