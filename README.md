@@ -100,9 +100,7 @@ ai-smart-energy-audit-system/
 │   ├── if.py                      # Isolation Forest training pipeline
 │   └── *.pkl                      # Serialized pre-trained models & scalers
 ├── scripts/
-│   ├── generate_dataset_graphs.py # Generates dataset visualizations
-│   ├── generate_power_graphs.py   # Generates RF & IF power forecast graphs
-│   ├── generate_report_docx.py    # Generates automated statistical .docx reports
+│   ├── generate_synthetic_data.py # Generates baseline data
 │   └── simulate_device*.py        # Local IoT hardware simulation scripts
 ├── docs/
 │   ├── energy_audit_statistical_report.docx
@@ -164,14 +162,6 @@ python server.py
 ```
 The server will start on `http://localhost:5000` and automatically load the pre-trained ML models from the `ml-models/` directory to begin processing incoming edge data.
 
-### 6. Generate Reports & Notebooks (Optional)
-To regenerate all graphs, case studies, and the `.docx` report with newly trained models:
-```bash
-cd scripts
-python generate_dataset_graphs.py
-python generate_power_graphs.py
-python generate_report_docx.py
-```
 
 ---
 
